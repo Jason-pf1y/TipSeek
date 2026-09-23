@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest  # 改回最新版，排队快！
+    runs-on: ubuntu-22.04  # 改用 22.04，兼顾兼容性和免排队
 
     steps:
     - uses: actions/checkout@v4
@@ -15,21 +15,15 @@ jobs:
     - name: Install Rust
       uses: dtolnay/rust-toolchain@stable
 
-    # 安装 musl 静态编译工具
-    - name: Install musl tools
-      run: sudo apt-get install -y musl-tools
+    # 补充可能缺失的系统依赖库，防止编译失败
+    - name: Install dependencies
+      run: sudo apt-get update && sudo apt-get install -y pkg-config libssl-dev
 
-    # 添加 musl 编译目标
-    - name: Add musl target
-      run: rustup target add x86_64-unknown-linux-musl
+    - name: Build Release
+      run: cargo build --release
 
-    # 使用 musl 进行静态编译（不依赖超算的 GLIBC）
-    - name: Build Release (musl static)
-      run: cargo build --release --target x86_64-unknown-linux-musl
-
-    # 上传编译好的可执行文件
     - name: Upload Binary
       uses: actions/upload-artifact@v4
       with:
         name: tipseek-linux-binary
-        path: target/x86_64-unknown-linux-musl/release/tipseek
+        path: target/release/tipseek
