@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-22.04  # 改用 22.04，兼顾兼容性和免排队
+    runs-on: ubuntu-22.04
 
     steps:
     - uses: actions/checkout@v4
@@ -15,19 +15,16 @@ jobs:
     - name: Install Rust
       uses: dtolnay/rust-toolchain@stable
 
-    # 补充可能缺失的系统依赖库，防止编译失败
-    - name: Install dependencies
-      run: sudo apt-get update && sudo apt-get install -y pkg-config libssl-dev
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y pkg-config libssl-dev
 
     - name: Build Release
       run: cargo build --release
 
-      - name: Upload Binaries
+    - name: Upload Binaries
       uses: actions/upload-artifact@v4
       with:
         name: tipseek-linux-binaries
-        # 打包 target/release/ 下所有编译好的可执行文件
-        path: |
-          target/release/tipseek
-          target/release/uce_filter
-          # 如果后面还有其他报错缺文件，依次加在这里
+        path: target/release/*
