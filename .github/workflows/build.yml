@@ -22,8 +22,12 @@ jobs:
     - name: Build Release
       run: cargo build --release
 
-    - name: Upload Binary
+      - name: Upload Binaries
       uses: actions/upload-artifact@v4
       with:
-        name: tipseek-linux-binary
-        path: target/release/tipseek
+        name: tipseek-linux-binaries
+        # 打包 target/release/ 下所有编译好的可执行文件
+        path: |
+          target/release/tipseek
+          target/release/uce_filter
+          # 如果后面还有其他报错缺文件，依次加在这里
